@@ -102,6 +102,15 @@
         <div class="divider"></div>
 
         <div class="section">
+            <h3>Out of Town</h3>
+            <label>
+                <input type="checkbox" id="outOfTown" onchange="calculateTotals()"> Out of Town
+            </label>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section">
             <h3>Totals</h3>
             <div class="result">
                 Subtotal: <span id="subtotal">₱0.00</span><br>
@@ -126,6 +135,7 @@
         function calculateTotals() {
             const numStudents = parseInt(document.getElementById('numStudents').value) || 0;
             const numTeachers = parseInt(document.getElementById('numTeachers').value) || 0;
+            const isOutOfTown = document.getElementById('outOfTown').checked;
 
             // Determine band and update dropdowns
             document.getElementById('bandStudents').value = getBand(numStudents);
@@ -144,10 +154,11 @@
             document.getElementById('feePerTeacher').innerText = formatCurrency(prices[getBand(numTeachers)][courseTeachers] || 0);
 
             const subtotal = totalStudents + totalTeachers;
-            const vat = subtotal * 0.12;
-            const grandTotal = subtotal + vat;
+            const adjustedSubtotal = isOutOfTown ? subtotal * 1.10 : subtotal;
+            const vat = adjustedSubtotal * 0.12;
+            const grandTotal = adjustedSubtotal + vat;
 
-            document.getElementById('subtotal').innerText = formatCurrency(subtotal);
+            document.getElementById('subtotal').innerText = formatCurrency(adjustedSubtotal);
             document.getElementById('vat').innerText = formatCurrency(vat);
             document.getElementById('grandTotal').innerText = formatCurrency(grandTotal);
         }
