@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeaderU Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: left;
+        }
+        .container {
+            max-width: 600px; /* Set a max-width for the content */
+            margin: 0 auto; /* Center the container */
+        }
+        img {
+            max-width: 100%; /* Make the logo responsive */
+            height: auto; /* Maintain aspect ratio */
+            display: block; /* Center the logo */
+            margin: 0 auto 20px; /* Add margin below the logo */
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .divider {
+            border-top: 1px solid #ccc;
+            margin: 20px 0;
+        }
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="LeaderU Logo.png" alt="LeaderU Logo">
+
+        <div class="section">
+            <h3>Students</h3>
+            <label for="numStudents">Number of students:</label>
+            <input type="number" id="numStudents" value="" oninput="calculateTotals()"><br>
+
+            <label for="bandStudents">Band:</label>
+            <select id="bandStudents" disabled>
+                <option value="">Select Band</option>
+                <option value="A">Band A (1-100 pax)</option>
+                <option value="B">Band B (101-200 pax)</option>
+                <option value="C">Band C (201-350 pax)</option>
+                <option value="D">Band D (351-600 pax)</option>
+                <option value="E">Band E (601-1000 pax)</option>
+                <option value="F">Band F (1001-2500 pax)</option>
+                <option value="G">Band G (2501-5000 pax)</option>
+                <option value="H">Band H (5001-10000 pax)</option>
+            </select><br>
+
+            <label for="courseStudents">Select Course:</label>
+            <select id="courseStudents" onchange="calculateTotals()">
+                <option value="1">1 e-course</option>
+                <option value="2">2 e-courses</option>
+            </select><br>
+
+            <div class="result">
+                Total: <span id="totalStudents">₱0.00</span><br>
+                Fee per student: <span id="feePerStudent">₱0.00</span>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section">
+            <h3>Teachers</h3>
+            <label for="numTeachers">Number of teachers:</label>
+            <input type="number" id="numTeachers" value="" oninput="calculateTotals()"><br>
+
+            <label for="bandTeachers">Band:</label>
+            <select id="bandTeachers" disabled>
+                <option value="">Select Band</option>
+                <option value="A">Band A (1-100 pax)</option>
+                <option value="B">Band B (101-200 pax)</option>
+                <option value="C">Band C (201-350 pax)</option>
+                <option value="D">Band D (351-600 pax)</option>
+                <option value="E">Band E (601-1000 pax)</option>
+                <option value="F">Band F (1001-2500 pax)</option>
+                <option value="G">Band G (2501-5000 pax)</option>
+                <option value="H">Band H (5001-10000 pax)</option>
+            </select><br>
+
+            <label for="courseTeachers">Select Course:</label>
+            <select id="courseTeachers" onchange="calculateTotals()">
+                <option value="1">1 e-course</option>
+                <option value="2">2 e-courses</option>
+            </select><br>
+
+            <div class="result">
+                Total: <span id="totalTeachers">₱0.00</span><br>
+                Fee per teacher: <span id="feePerTeacher">₱0.00</span>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section">
+            <h3>Totals</h3>
+            <div class="result">
+                Subtotal: <span id="subtotal">₱0.00</span><br>
+                12% VAT: <span id="vat">₱0.00</span><br>
+                Grand Total: <span id="grandTotal">₱0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const prices = {
+            A: { 1: 1381.82, 2: 2470.00 },
+            B: { 1: 1256.20, 2: 2245.45 },
+            C: { 1: 1142.00, 2: 2041.32 },
+            D: { 1: 1038.18, 2: 1855.75 },
+            E: { 1: 943.80, 2: 1687.04 },
+            F: { 1: 858.00, 2: 1533.68 },
+            G: { 1: 780.00, 2: 1394.25 },
+            H: { 1: 650.00, 2: 1267.50 }
+        };
+
+        function calculateTotals() {
+            const numStudents = parseInt(document.getElementById('numStudents').value) || 0;
+            const numTeachers = parseInt(document.getElementById('numTeachers').value) || 0;
+
+            // Determine band and update dropdowns
+            document.getElementById('bandStudents').value = getBand(numStudents);
+            document.getElementById('bandTeachers').value = getBand(numTeachers);
+
+            const courseStudents = parseInt(document.getElementById('courseStudents').value);
+            const courseTeachers = parseInt(document.getElementById('courseTeachers').value);
+
+            const totalStudents = numStudents * (prices[getBand(numStudents)][courseStudents] || 0);
+            const totalTeachers = numTeachers * (prices[getBand(numTeachers)][courseTeachers] || 0);
+
+            document.getElementById('totalStudents').innerText = formatCurrency(totalStudents);
+            document.getElementById('feePerStudent').innerText = formatCurrency(prices[getBand(numStudents)][courseStudents] || 0);
+            
+            document.getElementById('totalTeachers').innerText = formatCurrency(totalTeachers);
+            document.getElementById('feePerTeacher').innerText = formatCurrency(prices[getBand(numTeachers)][courseTeachers] || 0);
+
+            const subtotal = totalStudents + totalTeachers;
+            const vat = subtotal * 0.12;
+            const grandTotal = subtotal + vat;
+
+            document.getElementById('subtotal').innerText = formatCurrency(subtotal);
+            document.getElementById('vat').innerText = formatCurrency(vat);
+            document.getElementById('grandTotal').innerText = formatCurrency(grandTotal);
+        }
+
+        function getBand(pax) {
+            if (pax <= 100) return 'A';
+            if (pax <= 200) return 'B';
+            if (pax <= 350) return 'C';
+            if (pax <= 600) return 'D';
+            if (pax <= 1000) return 'E';
+            if (pax <= 2500) return 'F';
+            if (pax <= 5000) return 'G';
+            if (pax <= 10000) return 'H';
+            return '';
+        }
+
+        function formatCurrency(value) {
+            return '₱' + value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    </script>
+</body>
+</html>
